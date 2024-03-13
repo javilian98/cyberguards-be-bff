@@ -1,7 +1,6 @@
 export interface Case {
   id: string;
   title: string;
-  riskStatus: "low" | "medium" | "high";
   riskScore: number;
   createdAt: string;
   assigneeId: string;
@@ -13,7 +12,6 @@ export interface CaseDetail {
   id: string;
   title: string;
   description: string;
-  riskStatus: "low" | "medium" | "high";
   riskScore: number;
   createdAt?: string;
   assignee?: {
