@@ -37,7 +37,6 @@ caseRouter.get(
     .isInt({ max: 50 })
     .withMessage("Take must be less than or equal to 50."),
   query("userIds").optional().isString(),
-  query("logIds").optional().isString(),
   async (request: Request, response: Response) => {
     const errors = validationResult(request);
 
@@ -49,9 +48,6 @@ caseRouter.get(
       const casesQueries = {
         skip: request.query.skip ? Number(request.query.skip) : undefined,
         take: request.query.take ? Number(request.query.take) : undefined,
-        logIds: request.query.logIds
-          ? request.query.logIds.toString()
-          : undefined,
       };
 
       const cases = await axios.get("http://localhost:10000/api/cases", {
@@ -141,14 +137,47 @@ caseRouter.get("/:id", async (request: Request, response: Response) => {
   }
 });
 
+caseRouter.get(
+  "/employee/:id",
+  async (request: Request, response: Response) => {
+    try {
+      const singleCaseResponse = await axios.get(
+        `http://localhost:10000/api/cases/employee/${request.params.id}`
+      );
+      const singleCase = singleCaseResponse.data as Case;
+
+      console.log(
+        "SINGLE CASEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE ",
+        singleCase
+      );
+
+      const foundAssignee = await fetchUser(singleCase.assigneeId);
+
+      const newCaseDetail = {
+        ...singleCase,
+        assignee: {
+          fullName: foundAssignee
+            ? foundAssignee?.firstName + " " + foundAssignee?.lastName
+            : null,
+        },
+      };
+
+      return response.status(200).json(newCaseDetail);
+    } catch (error: any) {
+      console.error("Failed to fetch case data:", error);
+      return response.status(500).json(error.message);
+    }
+  }
+);
+
 caseRouter.post(
   "/",
   body("title").isString(),
   body("description").isString(),
   body("riskScore").isNumeric(),
-  body("threatPageUrl").isString(),
+  // body("threatPageUrl").isString(),
   body("assigneeId").isString().notEmpty().optional(),
-  body("logId").isString(),
+  body("employeeId").isString(),
   async (request: Request, response: Response) => {
     const errors = validationResult(request);
 
@@ -177,9 +206,9 @@ caseRouter.put(
   body("title").isString(),
   body("description").isString(),
   body("riskScore").isNumeric(),
-  body("threatPageUrl").isString(),
+  // body("threatPageUrl").isString(),
   body("assigneeId").isString().notEmpty().optional(),
-  body("logId").isString().notEmpty().optional(),
+  body("employeeId").isString(),
   async (request: Request, response: Response) => {
     const errors = validationResult(request);
 
