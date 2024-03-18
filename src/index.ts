@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import { caseRouter } from "./case/case.router";
 import { userRouter } from "./users/user.router";
+import { threatRouter } from "./threat/threat.router";
 
 dotenv.config();
 console.log("process.env.CASE_SERVICE_PORT ", process.env.BFF_SERVICE_PORT);
@@ -18,6 +19,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/api/cases", caseRouter);
 app.use("/api/users", userRouter);
+app.use("/api/threats", threatRouter);
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
