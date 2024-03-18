@@ -2,7 +2,13 @@ import express from "express";
 import type { Request, Response } from "express";
 import { body, query, validationResult } from "express-validator";
 import axios from "axios";
-import { Case, CaseDetail, UserDetail, UserListItem } from "../types/types";
+import {
+  Case,
+  CaseAuditLog,
+  CaseDetail,
+  UserDetail,
+  UserListItem,
+} from "../types/types";
 
 // import * as CaseService from "./case.service";
 
@@ -240,3 +246,93 @@ caseRouter.delete("/:id", async (request: Request, response: Response) => {
     return response.status(500).json(error.message);
   }
 });
+
+caseRouter.get(
+  "/logs/case_audit_logs",
+  query("skip")
+    .optional()
+    .isNumeric()
+    .toInt()
+    .withMessage("Skip must be a number"),
+  query("take")
+    .optional()
+    .isNumeric()
+    .toInt()
+    .withMessage("Take must be a number")
+    .isInt({ max: 50 })
+    .withMessage("Take must be less than or equal to 50."),
+  async (request: Request, response: Response) => {
+    const errors = validationResult(request);
+
+    if (!errors.isEmpty()) {
+      return response.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+      const queries = {
+        skip: request.query.skip ? Number(request.query.skip) : undefined,
+        take: request.query.take ? Number(request.query.take) : undefined,
+      };
+
+      const caseAuditLogResponse = await axios.get(
+        "http://localhost:10000/api/cases/logs/case_audit_logs",
+        {
+          params: queries,
+        }
+      );
+      const usersData = await fetchUsers({
+        queries,
+      });
+
+      console.log("287: >>>>>", usersData);
+
+      const newCaseAuditLogListData = caseAuditLogResponse.data.map(
+        (log: CaseAuditLog) => {
+          const foundAssignee = usersData.find(
+            (userItem: UserListItem) => userItem.id === log.assigneeId
+          );
+
+          return {
+            ...log,
+            assignee: {
+              fullName: foundAssignee
+                ? foundAssignee.firstName + " " + foundAssignee.lastName
+                : null,
+            },
+          };
+        }
+      );
+      return response.status(200).json(newCaseAuditLogListData);
+    } catch (error: any) {
+      console.log(error);
+      return response.status(500).json(error.message);
+    }
+  }
+);
+
+caseRouter.post(
+  "/case_audit_logs",
+  body("caseId").isString(),
+  body("assigneeId").isString().notEmpty().optional(),
+  body("action").isString(),
+  body("edits").isString(),
+  async (request: Request, response: Response) => {
+    const errors = validationResult(request);
+
+    if (!errors.isEmpty()) {
+      return response.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+      const log = request.body;
+      const newLogResponse = await axios.post(
+        `http://localhost:10000/api/cases/case_audit_logs`,
+        log
+      );
+      const newLog = newLogResponse.data;
+      return response.status(201).json(newLog);
+    } catch (error: any) {
+      return response.status(500).json(error.message);
+    }
+  }
+);

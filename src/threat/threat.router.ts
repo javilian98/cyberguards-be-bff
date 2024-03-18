@@ -47,3 +47,56 @@ threatRouter.get(
     return response.status(200).json(threatDetailData);
   }
 );
+
+/*
+ * Commented out implementation work-in-progress until AI service is done
+ */
+// threatRouter.get("/generate", async (request: Request, response: Response) => {
+//   // 1. GET a random employee (1 out of 800 employees) from employees (datasource) microservice
+//   const randomEmployeeId = getRandomInt(1, 800);
+//   const employeeInfoResponse = await axios.get(
+//     `http://localhost:8080/employees/employee/${randomEmployeeId}`
+//   );
+//   const employeeInfoData = employeeInfoResponse.data;
+
+//   console.log("EMPLOYEE INFO DATA >>>", employeeInfoData);
+
+//   // 2. GET one of the three logs by random (building access logs, pc access logs, proxy logs) associated with employeeId
+//   const buildingAccessLogsResponse = await axios.get(
+//     `http://localhost:8080/employees/building_access/employee/${randomEmployeeId}`
+//   );
+//   const buildingAccessLogsData = buildingAccessLogsResponse.data;
+//   console.log(
+//     "EMPLOYEE BUILDING ACCESS LOGS DATA >>>",
+//     buildingAccessLogsData.length
+//   );
+
+//   const randomLogIndex = getRandomInt(0, buildingAccessLogsData.length - 1);
+//   const selectedBuildingAccessLog = buildingAccessLogsData[randomLogIndex];
+//   console.log("BUILDING ACCCES LOG SELECTED >>>", selectedBuildingAccessLog);
+
+//   // 3. FORMAT data
+
+//   const formattedBuildingAccessLogResponseForAIService = {
+//     id: selectedBuildingAccessLog.id,
+//     accessDateTime: selectedBuildingAccessLog.accessDateTime,
+//     direction: selectedBuildingAccessLog.direction,
+//     status: selectedBuildingAccessLog.status,
+//     officeLocation: selectedBuildingAccessLog.officeLocation,
+//     employeeId: selectedBuildingAccessLog.userId,
+//     joinedDate: employeeInfoData.joinedDate,
+//     terminatedDate: employeeInfoData.terminatedDate,
+//   };
+
+//   return response
+//     .status(200)
+//     .json({
+//       message: "New threat generated",
+//       data: formattedBuildingAccessLogResponseForAIService,
+//     });
+// });
+
+// // Get a random integer between min (inclusive) and max (inclusive)
+// function getRandomInt(min: number, max: number) {
+//   return Math.floor(Math.random() * (max - min + 1)) + min;
+// }

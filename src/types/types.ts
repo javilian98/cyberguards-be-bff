@@ -137,3 +137,11 @@ export interface ThreatDetailAPIResponse {
     proxy: ProxyLogAPIResponse[];
   };
 }
+
+export type CaseAuditLog = {
+  id: string;
+  caseId: string;
+  assigneeId: string | null;
+  action: string;
+  edits: string;
+};
