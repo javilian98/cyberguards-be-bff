@@ -5,7 +5,7 @@ export interface Case {
   createdAt: string;
   assigneeId: string;
   assignedDateTime?: string;
-  suspectedUserId: string;
+  employeeId: string;
 }
 
 export interface CaseDetail {
@@ -19,7 +19,7 @@ export interface CaseDetail {
     fullName: string;
   };
   assignedDateTime?: string;
-  suspectedUser?: {
+  employee?: {
     id: string;
     fullName: string;
   };
@@ -114,22 +114,23 @@ export interface ThreatAPIResponse {
   offenceLogCount: number;
 }
 
+export interface Employee {
+  business_unit: string;
+  email: string;
+  employeeid: number;
+  firstname: string;
+  lastname: string;
+  gender: string;
+  joined_date: string;
+  location: string;
+  profile: number;
+  suspect: boolean;
+  terminated_date: string | null;
+}
 export interface ThreatDetailAPIResponse {
   id: number;
   employeeId: number;
-  employeeInfo: {
-    business_unit: string;
-    email: string;
-    employeeid: number;
-    firstname: string;
-    lastname: string;
-    gender: string;
-    joined_date: string;
-    location: string;
-    profile: number;
-    suspect: boolean;
-    terminated_date: string | null;
-  };
+  employeeInfo: Employee;
   offenceLogCount: number;
   logs: {
     buildingAccess: BuildingAccessLogAPIResponse[];

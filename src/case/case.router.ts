@@ -5,7 +5,8 @@ import axios from "axios";
 import {
   Case,
   CaseAuditLog,
-  CaseDetail,
+  // CaseDetail,
+  Employee,
   UserDetail,
   UserListItem,
 } from "../types/types";
@@ -72,22 +73,12 @@ caseRouter.get(
         const foundAssignee = usersData.find(
           (userItem: UserListItem) => userItem.id === caseItem.assigneeId
         );
-        const foundSuspectedUser = usersData.find(
-          (userItem: UserListItem) => userItem.id === caseItem.suspectedUserId
-        );
 
         return {
           ...caseItem,
           assignee: {
             fullName: foundAssignee
               ? foundAssignee.firstName + " " + foundAssignee.lastName
-              : null,
-          },
-          suspectedUser: {
-            fullName: foundSuspectedUser
-              ? foundSuspectedUser?.firstName +
-                " " +
-                foundSuspectedUser?.lastName
               : null,
           },
         };
@@ -112,6 +103,17 @@ const fetchUser = async (userId: string): Promise<UserDetail | null> => {
     return null;
   }
 };
+const fetchEmployee = async (employeeId: string): Promise<Employee | null> => {
+  try {
+    const { data: employeeResponse } = await axios.get(
+      `http://localhost:5000/employees/${employeeId}`
+    );
+    return employeeResponse.data as Employee;
+  } catch (error) {
+    console.error("Failed to fetch user data:", error);
+    return null;
+  }
+};
 caseRouter.get("/:id", async (request: Request, response: Response) => {
   try {
     const singleCaseResponse = await axios.get(
@@ -120,7 +122,9 @@ caseRouter.get("/:id", async (request: Request, response: Response) => {
     const singleCase = singleCaseResponse.data as Case;
 
     const foundAssignee = await fetchUser(singleCase.assigneeId);
-    const foundSuspectedUser = await fetchUser(singleCase.suspectedUserId);
+    const foundEmployee = await fetchEmployee(singleCase.employeeId);
+
+    console.log("FOUND EMPLOYEE >> ", foundEmployee);
 
     const newCaseDetail = {
       ...singleCase,
@@ -129,9 +133,9 @@ caseRouter.get("/:id", async (request: Request, response: Response) => {
           ? foundAssignee?.firstName + " " + foundAssignee?.lastName
           : null,
       },
-      suspectedUser: {
-        fullName: foundSuspectedUser
-          ? foundSuspectedUser?.firstName + " " + foundSuspectedUser?.lastName
+      employee: {
+        fullName: foundEmployee
+          ? foundEmployee?.firstname + " " + foundEmployee?.lastname
           : null,
       },
     };
