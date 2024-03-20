@@ -73,6 +73,25 @@ userRouter.get("/:id", async (request: Request, response: Response) => {
   }
 });
 
+userRouter.get(
+  "/email/:email",
+  async (request: Request, response: Response) => {
+    try {
+      const singleUserResponse = await axios.get(
+        `http://localhost:10001/api/users/email/${request.params.email}`
+      );
+      if (!singleUserResponse) {
+        return response.status(404).json("User cannot be not found.");
+      }
+
+      const singleUser = singleUserResponse.data;
+      return response.status(200).json(singleUser);
+    } catch (error: any) {
+      return response.status(500).json(error.message);
+    }
+  }
+);
+
 // POST: Create a User
 // PARAMS: firstName, lastName, employeeType, roleId, riskStatus, riskScore, suspectType
 userRouter.post(
