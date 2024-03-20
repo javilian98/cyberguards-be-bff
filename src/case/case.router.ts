@@ -319,7 +319,7 @@ caseRouter.post(
   body("caseId").isString(),
   body("assigneeId").isString().notEmpty().optional(),
   body("action").isString(),
-  body("edits").isString(),
+  body("edits").isString().notEmpty().optional(),
   async (request: Request, response: Response) => {
     const errors = validationResult(request);
 
