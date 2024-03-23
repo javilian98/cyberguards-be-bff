@@ -5,24 +5,23 @@ import axios from "axios";
 import {
   Case,
   CaseAuditLog,
-  // CaseDetail,
   Employee,
   UserDetail,
   UserListItem,
 } from "../types/types";
-
-// import * as CaseService from "./case.service";
+import {
+  axiosCaseService,
+  axiosThreatService,
+  axiosUserService,
+} from "../utils/baseApi";
 
 export const caseRouter = express.Router();
 
 const fetchUsers = async (queries: any): Promise<UserDetail[]> => {
   try {
-    const { data: usersResponse } = await axios.get(
-      "http://localhost:10001/api/users",
-      {
-        params: queries,
-      }
-    );
+    const { data: usersResponse } = await axiosUserService.get(`/api/users`, {
+      params: queries,
+    });
     return usersResponse;
   } catch (error) {
     console.error("Failed to fetch user data:", error);
@@ -57,7 +56,7 @@ caseRouter.get(
         take: request.query.take ? Number(request.query.take) : undefined,
       };
 
-      const cases = await axios.get("http://localhost:10000/api/cases", {
+      const cases = await axiosCaseService.get(`/api/cases`, {
         params: casesQueries,
       });
 
@@ -94,8 +93,8 @@ caseRouter.get(
 
 const fetchUser = async (userId: string): Promise<UserDetail | null> => {
   try {
-    const { data: userResponse } = await axios.get(
-      `http://localhost:10001/api/users/${userId}`
+    const { data: userResponse } = await axiosUserService.get(
+      `/api/users/${userId}`
     );
     return userResponse as UserDetail;
   } catch (error) {
@@ -105,8 +104,8 @@ const fetchUser = async (userId: string): Promise<UserDetail | null> => {
 };
 const fetchEmployee = async (employeeId: string): Promise<Employee | null> => {
   try {
-    const { data: employeeResponse } = await axios.get(
-      `http://localhost:5000/employees/${employeeId}`
+    const { data: employeeResponse } = await axiosThreatService.get(
+      `/employees/${employeeId}`
     );
     return employeeResponse.data as Employee;
   } catch (error) {
@@ -116,8 +115,8 @@ const fetchEmployee = async (employeeId: string): Promise<Employee | null> => {
 };
 caseRouter.get("/:id", async (request: Request, response: Response) => {
   try {
-    const singleCaseResponse = await axios.get(
-      `http://localhost:10000/api/cases/${request.params.id}`
+    const singleCaseResponse = await axiosCaseService.get(
+      `/api/cases/${request.params.id}`
     );
     const singleCase = singleCaseResponse.data as Case;
 
@@ -151,8 +150,8 @@ caseRouter.get(
   "/employee/:id",
   async (request: Request, response: Response) => {
     try {
-      const singleCaseResponse = await axios.get(
-        `http://localhost:10000/api/cases/employee/${request.params.id}`
+      const singleCaseResponse = await axiosCaseService.get(
+        `/api/cases/employee/${request.params.id}`
       );
       const singleCase = singleCaseResponse.data as Case;
 
@@ -197,8 +196,8 @@ caseRouter.post(
 
     try {
       const caseItem = request.body;
-      const newCaseResponse = await axios.post(
-        "http://localhost:10000/api/cases",
+      const newCaseResponse = await axiosCaseService.post(
+        `/api/cases`,
         caseItem
       );
       const newCase = newCaseResponse.data;
@@ -228,8 +227,8 @@ caseRouter.put(
 
     try {
       const caseItem = request.body;
-      const updatedCaseResponse = await axios.put(
-        `http://localhost:10000/api/cases/${request.params.id}`,
+      const updatedCaseResponse = await axiosCaseService.put(
+        `/api/cases/${request.params.id}`,
         caseItem
       );
       const updatedCase = updatedCaseResponse.data;
@@ -244,7 +243,7 @@ caseRouter.put(
 // DELETE: Delete a Case based on its uuid
 caseRouter.delete("/:id", async (request: Request, response: Response) => {
   try {
-    await axios.delete(`http://localhost:10000/api/cases/${request.params.id}`);
+    await axiosCaseService.delete(`/api/cases/${request.params.id}`);
     return response.status(204).json("Case has been successfully deleted.");
   } catch (error: any) {
     return response.status(500).json(error.message);
@@ -278,8 +277,8 @@ caseRouter.get(
         take: request.query.take ? Number(request.query.take) : undefined,
       };
 
-      const caseAuditLogResponse = await axios.get(
-        "http://localhost:10000/api/cases/logs/case_audit_logs",
+      const caseAuditLogResponse = await axiosCaseService.get(
+        `/api/cases/logs/case_audit_logs`,
         {
           params: queries,
         }
@@ -329,8 +328,8 @@ caseRouter.post(
 
     try {
       const log = request.body;
-      const newLogResponse = await axios.post(
-        `http://localhost:10000/api/cases/case_audit_logs`,
+      const newLogResponse = await axiosCaseService.post(
+        `/api/cases/case_audit_logs`,
         log
       );
       const newLog = newLogResponse.data;

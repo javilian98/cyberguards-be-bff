@@ -6,7 +6,6 @@ import { userRouter } from "./users/user.router";
 import { threatRouter } from "./threat/threat.router";
 
 dotenv.config();
-console.log("process.env.CASE_SERVICE_PORT ", process.env.BFF_SERVICE_PORT);
 if (!process.env.BFF_SERVICE_PORT) {
   process.exit(1);
 }
@@ -21,6 +20,6 @@ app.use("/api/cases", caseRouter);
 app.use("/api/users", userRouter);
 app.use("/api/threats", threatRouter);
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Listening on port ${PORT}`);
 });

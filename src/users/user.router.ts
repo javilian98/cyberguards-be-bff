@@ -2,6 +2,7 @@ import express from "express";
 import type { Request, Response } from "express";
 import { body, query, validationResult } from "express-validator";
 import axios from "axios";
+import { axiosUserService } from "../utils/baseApi";
 
 export const userRouter = express.Router();
 
@@ -42,12 +43,9 @@ userRouter.get(
           : undefined,
       };
 
-      const usersResponse = await axios.get(
-        "http://localhost:10001/api/users",
-        {
-          params: queries,
-        }
-      );
+      const usersResponse = await axiosUserService.get(`/api/users`, {
+        params: queries,
+      });
 
       const users = usersResponse.data;
       return response.status(200).json(users);
@@ -60,8 +58,8 @@ userRouter.get(
 
 userRouter.get("/:id", async (request: Request, response: Response) => {
   try {
-    const singleUserResponse = await axios.get(
-      `http://localhost:10001/api/users/${request.params.id}`
+    const singleUserResponse = await axiosUserService.get(
+      `/api/users/${request.params.id}`
     );
     if (!singleUserResponse) {
       return response.status(404).json("User cannot be not found.");
@@ -77,8 +75,8 @@ userRouter.get(
   "/email/:email",
   async (request: Request, response: Response) => {
     try {
-      const singleUserResponse = await axios.get(
-        `http://localhost:10001/api/users/email/${request.params.email}`
+      const singleUserResponse = await axiosUserService.get(
+        `/api/users/email/${request.params.email}`
       );
       if (!singleUserResponse) {
         return response.status(404).json("User cannot be not found.");
@@ -107,8 +105,8 @@ userRouter.post(
 
     try {
       const userItem = request.body;
-      const newUserResponse = await axios.post(
-        "http://localhost:10001/api/users/",
+      const newUserResponse = await axiosUserService.post(
+        `/api/users/`,
         userItem
       );
       const newUser = newUserResponse.data;
@@ -134,8 +132,8 @@ userRouter.put(
 
     try {
       const userItem = request.body;
-      const updatedUserResponse = await axios.put(
-        `http://localhost:10001/api/users/${request.params.id}`,
+      const updatedUserResponse = await axiosUserService.put(
+        `/api/users/${request.params.id}`,
         userItem
       );
       const updatedUser = updatedUserResponse.data;
@@ -149,7 +147,7 @@ userRouter.put(
 
 userRouter.delete("/:id", async (request: Request, response: Response) => {
   try {
-    await axios.delete(`http://localhost:10001/api/users/${request.params.id}`);
+    await axiosUserService.delete(`/api/users/${request.params.id}`);
     return response.status(204).json("User has been successfully deleted.");
   } catch (error: any) {
     return response.status(500).json(error.message);

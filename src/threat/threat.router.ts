@@ -8,19 +8,24 @@ import {
   ThreatAPIResponse,
   ThreatDetailAPIResponse,
 } from "../types/types";
+import {
+  axiosEmployeeService,
+  axiosPredictionService,
+  axiosThreatService,
+} from "../utils/baseApi";
 
 export const threatRouter = express.Router();
 
 threatRouter.get("/", async (request: Request, response: Response) => {
   // 1. GET Threats
-  const threatsResponse = await axios.get("http://localhost:5000/threats");
+  const threatsResponse = await axiosThreatService.get("/threats");
   const threatsData: ThreatAPIResponse[] = await threatsResponse.data;
 
   // 2. GET employees by employeeIds from Threats
   const employeesData = await Promise.all(
     threatsData.map(async (threat) => {
-      const employeeResponse = await axios.get(
-        `http://localhost:5000/employees/${threat.employeeId}`
+      const employeeResponse = await axiosThreatService.get(
+        `/employees/${threat.employeeId}`
       );
 
       const employeeData = employeeResponse.data.data;
@@ -43,8 +48,8 @@ threatRouter.get("/", async (request: Request, response: Response) => {
 threatRouter.get(
   "/employee/:id",
   async (request: Request, response: Response) => {
-    const threatDetailResponse = await axios.get(
-      `http://localhost:5000/threats/${request.params.id}`
+    const threatDetailResponse = await axiosThreatService.get(
+      `/threats/${request.params.id}`
     );
     const threatDetailData: ThreatDetailAPIResponse[] =
       await threatDetailResponse.data;
@@ -68,8 +73,8 @@ threatRouter.get("/generate", async (request: Request, response: Response) => {
   const randomLogTypeML = logTypesML[randomLogTypeIndex];
 
   // 3. GET one of the three logs by random (building access logs, pc access logs, proxy logs) associated with random employeeId
-  const LogsResponse = await axios.get(
-    `http://localhost:8080/employees/${randomLogTypeML}/employee/${randomEmployeeId}`
+  const LogsResponse = await axiosEmployeeService.get(
+    `/employees/${randomLogTypeML}/employee/${randomEmployeeId}`
   );
   const LogsData = LogsResponse.data;
 
@@ -83,16 +88,16 @@ threatRouter.get("/generate", async (request: Request, response: Response) => {
     // "pc_access",
     "proxy_log",
   ];
-  const predictedSuspectLogResponse = await axios.post(
-    `http://localhost:5001/prediction/${logTypes[randomLogTypeIndex]}/predict`,
+  const predictedSuspectLogResponse = await axiosPredictionService.post(
+    `/prediction/${logTypes[randomLogTypeIndex]}/predict`,
     selectedLog
   );
   const predictedSuspectLogData = predictedSuspectLogResponse.data;
   console.log("predictedSuspectLogData >>>>", predictedSuspectLogData);
 
   // 4. GET employeeInfo & POST inside Threat service
-  const employeeInfoResponse = await axios.get(
-    `http://localhost:8080/employees/employee/${randomEmployeeId}`
+  const employeeInfoResponse = await axiosEmployeeService.get(
+    `/employees/employee/${randomEmployeeId}`
   );
   const employeeInfoData = employeeInfoResponse.data;
 
@@ -109,7 +114,7 @@ threatRouter.get("/generate", async (request: Request, response: Response) => {
     suspect: employeeInfoData.suspect,
     location: employeeInfoData.location,
   };
-  await axios.post(`http://localhost:5000/employees`, createEmployeePayload);
+  await axiosThreatService.post(`/employees`, createEmployeePayload);
 
   const payloadForThreatsService = transformPayloadFormatToThreatsService(
     randomLogTypeIndex,
@@ -118,8 +123,8 @@ threatRouter.get("/generate", async (request: Request, response: Response) => {
 
   console.log("threatLogCreatedData >>>>", payloadForThreatsService);
 
-  const threatLogCreatedResponse = await axios.post(
-    `http://localhost:5000/logs`,
+  const threatLogCreatedResponse = await axiosThreatService.post(
+    `/logs`,
     payloadForThreatsService
   );
   const threatLogCreatedData = threatLogCreatedResponse.data;
