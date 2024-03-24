@@ -184,7 +184,7 @@ caseRouter.post(
   body("title").isString(),
   body("description").isString(),
   body("riskScore").isNumeric(),
-  // body("threatPageUrl").isString(),
+  body("caseStatus").isNumeric().notEmpty().optional(),
   body("assigneeId").isString().notEmpty().optional(),
   body("employeeId").isString(),
   async (request: Request, response: Response) => {
@@ -215,7 +215,7 @@ caseRouter.put(
   body("title").isString(),
   body("description").isString(),
   body("riskScore").isNumeric(),
-  // body("threatPageUrl").isString(),
+  body("caseStatus").isNumeric().notEmpty().optional(),
   body("assigneeId").isString().notEmpty().optional(),
   body("employeeId").isString(),
   async (request: Request, response: Response) => {
