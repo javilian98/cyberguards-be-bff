@@ -1,0 +1,25 @@
+# Environment variables declared in this file are automatically made available to Prisma.
+# See the documentation for more detail: https://pris.ly/d/prisma-schema#accessing-environment-variables-from-the-schema
+
+# Prisma supports the native connection string format for PostgreSQL, MySQL, SQLite, SQL Server, MongoDB and CockroachDB.
+# See the documentation for all the connection string options: https://pris.ly/d/connection-strings
+
+BFF_SERVICE_PORT=9999
+
+#
+# Use these URLs if you are not running docker-compose
+#
+CASE_SERVICE_URL=http://localhost:10000
+USER_SERVICE_URL=http://localhost:10001
+EMPLOYEE_SERVICE_URL=http://localhost:8080
+THREAT_SERVICE_URL=http://localhost:5000
+PREDICTION_SERVICE_URL=http://localhost:5001
+
+#
+# Use these URLs if you are running in docker-compose
+#
+# CASE_SERVICE_URL=http://case-service:10000
+# USER_SERVICE_URL=http://user-service:10001
+# EMPLOYEE_SERVICE_URL=http://employee-service:8080
+# THREAT_SERVICE_URL=http://threat-service:5000
+# PREDICTION_SERVICE_URL=http://prediction-service:5001
